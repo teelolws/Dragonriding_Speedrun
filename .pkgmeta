@@ -1,0 +1,8 @@
+package-as: Dragonriding_Speedrun
+
+move-folders:
+ Dragonriding_Speedrun/Source: Dragonriding_Speedrun
+
+ignore:
+ - LICENCE.md
+ - README.md
