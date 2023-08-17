@@ -10,8 +10,7 @@ function addon.questAcceptedHandler(...)
     for _, v in pairs(addon.questIDs) do
         if questID == v then
             currentQuest = questID
-            addon.startTimers()
-            addon.eventListener:RegisterEvent("DISPLAY_EVENT_TOASTS")
+            addon.eventListener:RegisterEvent("UNIT_AURA")
             addon.findVertices()
             addon.CountdownLabel:Show()
             return
@@ -19,15 +18,50 @@ function addon.questAcceptedHandler(...)
     end
 end
 
+local currentRaceStartAuraInstanceID
+
 function addon.questRemovedHandler(...)
     local questID = ...
     if currentQuest ~= questID then return end
     addon.CountdownLabel:Hide()
+    currentRaceStartAuraInstanceID = nil
     
     C_Timer.After(2, function()
         addon.eventListener:UnregisterEvent("DISPLAY_EVENT_TOASTS")
         addon.stopTimers()
     end)
+end
+
+function addon.unitAuraHandler(...)
+    local unitID, updateInfo = ...
+    if unitID ~= "player" then return end
+    
+    if currentRaceStartAuraInstanceID then
+        if not updateInfo.removedAuraInstanceIDs then
+            return
+        end
+        if not currentQuest then
+            return
+        end
+        for _, removedAuraInstanceID in pairs(updateInfo.removedAuraInstanceIDs) do
+            if removedAuraInstanceID == currentRaceStartAuraInstanceID then
+                addon.startTimers()
+                addon.eventListener:RegisterEvent("DISPLAY_EVENT_TOASTS")
+                currentRaceStartAuraInstanceID = nil
+                return
+            end
+        end
+        return
+    end
+    
+    if updateInfo.addedAuras then
+        for _, addedAuraData in pairs(updateInfo.addedAuras) do
+            if addon.raceStartingSpellIDs[addedAuraData.spellId] then
+                currentRaceStartAuraInstanceID = addedAuraData.auraInstanceID
+                return
+            end
+        end
+    end
 end
 
 function addon.displayEventToastHandler()
@@ -56,6 +90,7 @@ addon.eventListener:RegisterEvent("QUEST_ACCEPTED")
 addon.eventListener:RegisterEvent("QUEST_REMOVED")
 addon.eventListener:RegisterEvent("ADDON_LOADED")
 addon.eventListener:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+addon.eventListener:RegisterEvent("UNIT_AURA")
 
 addon.eventListener:SetScript("OnEvent", function(self, event, ...)
     if event == "QUEST_ACCEPTED" then
@@ -68,6 +103,8 @@ addon.eventListener:SetScript("OnEvent", function(self, event, ...)
         addon.displayEventToastHandler(...)
     elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
         addon.unitSpellcastSucceededHandler(...)
+    elseif event == "UNIT_AURA" then
+        addon.unitAuraHandler(...)
     end
 end)
 
@@ -96,15 +133,7 @@ function addon.startTimers()
 end
 
 function addon.resetTimers()
-    local x, y, z, instanceID = UnitPosition("player")
-    startTime = GetTime()
-    
-    currentRaceData = {}
-    table.insert(currentRaceData, {
-        ["time"] = 0,
-        ["x"] = x,
-        ["y"] = y,
-    })
+    addon.stopTimers()
 end
 
 --
