@@ -69,7 +69,7 @@ function addon.displayEventToastHandler()
     if toastInfo.displayType ~= 6 then return end
     
     local text = toastInfo.subtitle
-    local raceTime = text:match("Race Time: (%d+%.%d+) seconds")
+    local raceTime = text:match(addon.raceTimePattern[GetLocale()])
     if not raceTime then return end
     
     raceTime = tonumber(raceTime)
@@ -255,6 +255,7 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     
     local x, y, z, instanceID = UnitPosition("player")
     if instanceID ~= currentInstanceID then return end
+    if not x then return end
     
     local elapsedTime = GetTime() - startTime
     local output = ""

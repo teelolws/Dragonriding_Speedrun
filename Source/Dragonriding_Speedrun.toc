@@ -12,4 +12,5 @@ libs\EditModeExpanded-1.0\EditModeExpanded-1.0.xml
 
 QuestIDs.lua
 RaceStartingSpellIDs.lua
+RaceCompletePhrases.lua
 Dragonriding_Speedrun.lua
