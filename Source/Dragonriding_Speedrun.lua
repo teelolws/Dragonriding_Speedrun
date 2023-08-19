@@ -11,7 +11,7 @@ function addon.questAcceptedHandler(...)
         if questID == v then
             currentQuest = questID
             addon.eventListener:RegisterEvent("UNIT_AURA")
-            addon.findVertices()
+            addon.findVertices(currentQuest)
             addon.CountdownLabel:Show()
             return
         end
@@ -83,7 +83,7 @@ function addon.unitSpellcastSucceededHandler(...)
     if spellID ~= 370007 then return end
     
     addon.resetTimers()
-    addon.findVertices()
+    addon.findVertices(currentQuest)
 end
 
 addon.eventListener:RegisterEvent("QUEST_ACCEPTED")
@@ -213,29 +213,6 @@ function addon.processEndOfRace(raceTime)
     DragonridingSpeedrunDB[currentQuest].nodes = currentRaceData
 end
 
-local currentVertices = {}
-local nextVertexNum
-local currentVerticesTimes = {}
-
-local NUM_VERTICES = 6
-
-function addon.findVertices()
-    wipe(currentVertices)
-    nextVertexNum = 1
-    wipe(currentVerticesTimes)
-    
-    local data = DragonridingSpeedrunDB[currentQuest]
-    
-    if data == nil then return end
-    
-    local numNodes = #data.nodes
-    for i = 1, NUM_VERTICES do
-        local num = math.floor((numNodes / 6) * i)
-        table.insert(currentVertices, data.nodes[num])
-    end
-    table.insert(currentVertices, data.nodes[numNodes])
-end
-
 addon.CountdownLabel = CreateFrame("Frame", "DragonridingSpeedrunLabel", UIParent)
 addon.CountdownLabel:SetPoint("LEFT", UIParent, "LEFT")
 addon.CountdownLabel:SetSize(80, 50)
@@ -245,13 +222,13 @@ addon.CountdownLabel.Text:SetPoint("CENTER")
 addon.CountdownLabel.Text:SetJustifyH("LEFT")
 addon.CountdownLabel:Hide()
 
-local RADIUS_PERMITTED = 30
+local RADIUS_PERMITTED = 10
 
 addon.CountdownLabel:SetScript("OnUpdate", function()
     if EditModeManagerFrame.editModeActive then return end  
     addon.CountdownLabel.Text:SetText("")
     if not currentQuest then return end
-    if #currentVertices == 0 then return end
+    if #addon.currentVertices == 0 then return end
     
     local x, y, z, instanceID = UnitPosition("player")
     if instanceID ~= currentInstanceID then return end
@@ -259,19 +236,21 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     
     local elapsedTime = GetTime() - startTime
     local output = ""
+    local currentVertex
     
-    for i = 1, NUM_VERTICES do
-        local vertex = currentVertices[i]
-        if i < nextVertexNum then
-            local timeDiff = vertex.time - currentVerticesTimes[i]
+    for i = 1, #addon.currentVertices do
+        local vertex = addon.currentVertices[i]
+        if i < addon.nextVertexNum then
+            local timeDiff = vertex.time - addon.currentVerticesTimes[i]
             timeDiff = math.floor(timeDiff*100)/100
             if timeDiff < 0 then
                 output = output.."|cFFFF0000"..timeDiff.."|r\n"
             else
                 output = output.."|c00008000"..timeDiff.."|r\n"
             end
-        elseif i == nextVertexNum then
+        elseif i == addon.nextVertexNum then
             local timeDiff = vertex.time - elapsedTime
+            currentVertex = vertex
             timeDiff = math.floor(timeDiff*100)/100
             if timeDiff < 0 then
                 output = output.."|cFFFF0000"..timeDiff.."|r\n"
@@ -280,23 +259,24 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
             end
         else
             local time = vertex.time
+            time = time - currentVertex.time
             time = math.floor(time*100)/100
             output = output.."|c00808080"..time.."|r\n"
         end
     end
     addon.CountdownLabel.Text:SetText(output)
     
-    local nextVertex = currentVertices[nextVertexNum]
+    local nextVertex = addon.currentVertices[addon.nextVertexNum]
     if not nextVertex then return end
     local diffX, diffY = x - nextVertex.x, y - nextVertex.y 
     if (diffX < RADIUS_PERMITTED) and (diffX > (-1 * RADIUS_PERMITTED)) then
         if (diffY < RADIUS_PERMITTED) and (diffY > (-1 * RADIUS_PERMITTED)) then
-            currentVerticesTimes[nextVertexNum] = elapsedTime
-            nextVertexNum = nextVertexNum + 1
+            addon.currentVerticesTimes[addon.nextVertexNum] = elapsedTime
+            addon.nextVertexNum = addon.nextVertexNum + 1
         end
     end
 end)
 
 hooksecurefunc(EditModeManagerFrame, "EnterEditMode", function()
-    addon.CountdownLabel.Text:SetText("123.45\n|cFFFF0000-123.45\n123.45\n|r|c00008000123.45|r")
+    addon.CountdownLabel.Text:SetText("123.45\n|cFFFF0000-123.45\n123.45\n|r|c00008000123.45|r\n|c0080808012.34\n12.34\n12.34\n12.34\n12.34\n12.34\n|r")
 end)

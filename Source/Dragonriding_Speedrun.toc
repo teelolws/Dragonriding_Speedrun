@@ -1,7 +1,7 @@
 ## Interface: 100105
 ## SavedVariables: DragonridingSpeedrunDB, DragonridingSpeedrunUI
 ## Title: Dragonriding Speedrun
-## Version: 10.1-002
+## Version: 10.1-003
 ## Notes: Helps you tell if you're doing better than your best attempt at Dragonriding Races
 ## Author: Teelo
 ## X-Curse-Project-ID: 903541
@@ -13,4 +13,6 @@ libs\EditModeExpanded-1.0\EditModeExpanded-1.0.xml
 QuestIDs.lua
 RaceStartingSpellIDs.lua
 RaceCompletePhrases.lua
+VertexCalculations.lua
 Dragonriding_Speedrun.lua
+
