@@ -5,6 +5,6 @@ Similar to a Speed runners overlay, this will show timers for various points aro
 
 After installing this addon, the first time you run a race, your route and times will be remembered. On your next attempt, the UI will appear, showing your times and progress towards each checkpoint around the race.
 
-The checkpoints do not correspond with the "rings". I could not find a way for addons to detect when you pass through a ring. Instead, the checkpoints are just six evenly spaced points around the route.
+I could not find a way to detect when you pass through a ring, instead the addon makes a good guess based on when you make big changes in direction.
 
 You can move and resize the UI in Edit Mode!
