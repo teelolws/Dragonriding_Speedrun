@@ -4,12 +4,7 @@ addon.currentVertices = {}
 addon.nextVertexNum = 1
 addon.currentVerticesTimes = {}
 
-local MIN_VERTICES = 4
-local MAX_VERTICES = 10
 local CHANGE_THRESHOLD = math.pi/8
-local OVERRIDE_VERTICES = 6
-local SPACING = 3
-local SWITCH_DIRECTION_THRESHOLD = 4
 
 function addon.findVertices(currentQuest)
     wipe(addon.currentVertices)
@@ -53,7 +48,7 @@ function addon.findVertices(currentQuest)
             
             local angle = math.acos(dotproduct / (magLast * nodeMag))
             
-            if ((node.time - lastTime > SPACING)) and ((angle > threshold) or (angle < (threshold*-1))) then
+            if ((node.time - lastTime > addon.options.global.timeSpacing)) and ((angle > threshold) or (angle < (threshold*-1))) then
                 table.insert(addon.currentVertices, node)
                 
                 originX, originY = data.nodes[i-1].x, data.nodes[i-1].y
@@ -65,16 +60,16 @@ function addon.findVertices(currentQuest)
         end
         
         threshold = threshold + 0.001
-    until (#addon.currentVertices < MAX_VERTICES)
+    until (#addon.currentVertices < addon.options.global.maxVertices)
     
     table.insert(addon.currentVertices, data.nodes[#data.nodes])
     
-    if #addon.currentVertices < MIN_VERTICES then
+    if #addon.currentVertices < addon.options.global.minVertices then
         wipe(addon.currentVertices)
     
         local numNodes = #data.nodes
-        for i = 1, OVERRIDE_VERTICES do
-            local num = math.floor((numNodes / OVERRIDE_VERTICES) * i)
+        for i = 1, addon.options.global.overrideVertices do
+            local num = math.floor((numNodes / addon.options.global.overrideVertices) * i)
             table.insert(addon.currentVertices, data.nodes[num])
         end
     end
