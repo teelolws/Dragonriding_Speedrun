@@ -222,8 +222,6 @@ addon.CountdownLabel.Text:SetPoint("CENTER")
 addon.CountdownLabel.Text:SetJustifyH("LEFT")
 addon.CountdownLabel:Hide()
 
-local RADIUS_PERMITTED = 10
-
 addon.CountdownLabel:SetScript("OnUpdate", function()
     if EditModeManagerFrame.editModeActive then return end  
     addon.CountdownLabel.Text:SetText("")
@@ -269,8 +267,8 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     local nextVertex = addon.currentVertices[addon.nextVertexNum]
     if not nextVertex then return end
     local diffX, diffY = x - nextVertex.x, y - nextVertex.y 
-    if (diffX < RADIUS_PERMITTED) and (diffX > (-1 * RADIUS_PERMITTED)) then
-        if (diffY < RADIUS_PERMITTED) and (diffY > (-1 * RADIUS_PERMITTED)) then
+    if (diffX < addon.options.global.radiusPermitted) and (diffX > (-1 * addon.options.global.radiusPermitted)) then
+        if (diffY < addon.options.global.radiusPermitted) and (diffY > (-1 * addon.options.global.radiusPermitted)) then
             addon.currentVerticesTimes[addon.nextVertexNum] = elapsedTime
             addon.nextVertexNum = addon.nextVertexNum + 1
         end
