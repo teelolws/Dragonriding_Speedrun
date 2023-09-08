@@ -3,15 +3,22 @@ local addonName, addon = ...
 local libEME = LibStub:GetLibrary("EditModeExpanded-1.0")
 
 addon.eventListener = CreateFrame("Frame")
-local currentQuest
+addon.isMirrorQuest = nil
+addon.currentQuest = nil
 
 function addon.questAcceptedHandler(...)
     local questID = ...
     for _, v in pairs(addon.questIDs) do
         if questID == v then
-            currentQuest = questID
+            addon.currentQuest = questID
+            
+            local text, objectiveType, finished, fulfilled, required = GetQuestObjectiveInfo(questID, 1, false)
+            if (objectiveType == "monster") and (finished == false) and (fulfilled == 0) and (required == 9) then
+                addon:handleMirrorQuest(questID)
+            end
+            
             addon.eventListener:RegisterEvent("UNIT_AURA")
-            addon.findVertices(currentQuest)
+            addon.findVertices()
             addon.CountdownLabel:Show()
             return
         end
@@ -22,9 +29,11 @@ local currentRaceStartAuraInstanceID
 
 function addon.questRemovedHandler(...)
     local questID = ...
-    if currentQuest ~= questID then return end
+    if addon.currentQuest ~= questID then return end
     addon.CountdownLabel:Hide()
     currentRaceStartAuraInstanceID = nil
+    addon.isMirrorQuest = nil
+    addon.eventListener:UnregisterEvent("QUEST_WATCH_UPDATE")
     
     C_Timer.After(2, function()
         addon.eventListener:UnregisterEvent("DISPLAY_EVENT_TOASTS")
@@ -40,7 +49,7 @@ function addon.unitAuraHandler(...)
         if not updateInfo.removedAuraInstanceIDs then
             return
         end
-        if not currentQuest then
+        if not addon.currentQuest then
             return
         end
         for _, removedAuraInstanceID in pairs(updateInfo.removedAuraInstanceIDs) do
@@ -74,6 +83,10 @@ function addon.displayEventToastHandler()
     
     raceTime = tonumber(raceTime)
     addon.eventListener:UnregisterEvent("DISPLAY_EVENT_TOASTS")
+    addon.eventListener:UnregisterEvent("QUEST_WATCH_UPDATE")
+    
+    addon.isMirrorQuest = nil
+    
     addon.processEndOfRace(raceTime)
 end
 
@@ -83,7 +96,7 @@ function addon.unitSpellcastSucceededHandler(...)
     if spellID ~= 370007 then return end
     
     addon.resetTimers()
-    addon.findVertices(currentQuest)
+    addon.findVertices()
 end
 
 addon.eventListener:RegisterEvent("QUEST_ACCEPTED")
@@ -105,6 +118,8 @@ addon.eventListener:SetScript("OnEvent", function(self, event, ...)
         addon.unitSpellcastSucceededHandler(...)
     elseif event == "UNIT_AURA" then
         addon.unitAuraHandler(...)
+    elseif event == "QUEST_WATCH_UPDATE" then
+        addon.questWatchUpdateHandler(...)
     end
 end)
 
@@ -114,11 +129,14 @@ local ticker
 local currentRaceData = {}
 
 function addon.startTimers()
-    local x, y, z, instanceID = UnitPosition("player")
-    currentInstanceID = instanceID
+    currentRaceData = {}
     startTime = GetTime()
     
-    currentRaceData = {}
+    local x, y, z, instanceID = UnitPosition("player")
+    currentInstanceID = instanceID
+    
+    if addon.isMirrorQuest then return end
+    
     table.insert(currentRaceData, {
         ["time"] = 0,
         ["x"] = x,
@@ -154,6 +172,8 @@ end
 addon.raceData = {}
 
 function addon.ticker()
+    if addon.isMirrorQuest then return end
+    
     local x, y, z, instanceID = UnitPosition("player")
     
     if instanceID ~= currentInstanceID then
@@ -201,16 +221,26 @@ function addon.addonLoadedHandler(...)
 end
 
 function addon.processEndOfRace(raceTime)
-    if not DragonridingSpeedrunDB[currentQuest] then
-        DragonridingSpeedrunDB[currentQuest] = {}
+    if not DragonridingSpeedrunDB[addon.currentQuest] then
+        DragonridingSpeedrunDB[addon.currentQuest] = {}
     end
     
-    if DragonridingSpeedrunDB[currentQuest].bestTime and (DragonridingSpeedrunDB[currentQuest].bestTime < raceTime) then
+    if DragonridingSpeedrunDB[addon.currentQuest].bestTime and (DragonridingSpeedrunDB[addon.currentQuest].bestTime < raceTime) then
         return
     end
     
-    DragonridingSpeedrunDB[currentQuest].bestTime = raceTime
-    DragonridingSpeedrunDB[currentQuest].nodes = currentRaceData
+    local x, y, z, instanceID = UnitPosition("player")
+    local elapsedTime = GetTime() - startTime
+    
+    local data = {}
+    data.time = elapsedTime
+    data.x = x
+    data.y = y
+    
+    table.insert(currentRaceData, data)
+    
+    DragonridingSpeedrunDB[addon.currentQuest].bestTime = raceTime
+    DragonridingSpeedrunDB[addon.currentQuest].nodes = currentRaceData
 end
 
 addon.CountdownLabel = CreateFrame("Frame", "DragonridingSpeedrunLabel", UIParent)
@@ -225,7 +255,7 @@ addon.CountdownLabel:Hide()
 addon.CountdownLabel:SetScript("OnUpdate", function()
     if EditModeManagerFrame.editModeActive then return end  
     addon.CountdownLabel.Text:SetText("")
-    if not currentQuest then return end
+    if not addon.currentQuest then return end
     if #addon.currentVertices == 0 then return end
     
     local x, y, z, instanceID = UnitPosition("player")
@@ -264,6 +294,8 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     end
     addon.CountdownLabel.Text:SetText(output)
     
+    if addon.isMirrorQuest then return end
+    
     local nextVertex = addon.currentVertices[addon.nextVertexNum]
     if not nextVertex then return end
     local diffX, diffY = x - nextVertex.x, y - nextVertex.y 
@@ -278,3 +310,34 @@ end)
 hooksecurefunc(EditModeManagerFrame, "EnterEditMode", function()
     addon.CountdownLabel.Text:SetText("123.45\n|cFFFF0000-123.45\n123.45\n|r|c00008000123.45|r\n|c0080808012.34\n12.34\n12.34\n12.34\n12.34\n12.34\n|r")
 end)
+
+-- These use a different algorithm to handle races that explicitly show a counter for "number of rings" in the quest objective
+-- These races are ones that don't follow a set path, so instead use the quest objective to track whether the player has flown through each ring
+function addon:handleMirrorQuest(questID)
+    -- QUEST_WATCH_UPDATE is triggered when player flies through ring on these quests
+    
+    addon.eventListener:RegisterEvent("QUEST_WATCH_UPDATE")
+    addon.isMirrorQuest = true
+end
+
+function addon.questWatchUpdateHandler(...)
+    local questID = ...
+    
+    if not addon.isMirrorQuest then return end
+    
+    if questID ~= addon.currentQuest then return end
+    
+    local x, y, z, instanceID = UnitPosition("player")
+    
+    local elapsedTime = GetTime() - startTime
+    
+    local data = {}
+    data.time = elapsedTime
+    data.x = x
+    data.y = y
+    
+    table.insert(currentRaceData, data)
+    
+    addon.currentVerticesTimes[addon.nextVertexNum] = elapsedTime
+    addon.nextVertexNum = addon.nextVertexNum + 1
+end

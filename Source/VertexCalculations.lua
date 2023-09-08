@@ -6,14 +6,20 @@ addon.currentVerticesTimes = {}
 
 local CHANGE_THRESHOLD = math.pi/8
 
-function addon.findVertices(currentQuest)
+function addon.findVertices()
     wipe(addon.currentVertices)
     addon.nextVertexNum = 1
     wipe(addon.currentVerticesTimes)
     
-    local data = DragonridingSpeedrunDB[currentQuest]
+    local data = DragonridingSpeedrunDB[addon.currentQuest]
     
     if data == nil then return end
+    
+    if addon.isMirrorQuest then
+        addon.findMirrorVertices()
+        return
+    end
+    
     if #data.nodes < 5 then return end
     
     local threshold = CHANGE_THRESHOLD
@@ -72,5 +78,19 @@ function addon.findVertices(currentQuest)
             local num = math.floor((numNodes / addon.options.global.overrideVertices) * i)
             table.insert(addon.currentVertices, data.nodes[num])
         end
+    end
+end
+
+function addon.findMirrorVertices()
+    local data = DragonridingSpeedrunDB[addon.currentQuest]
+    
+    -- backwards compatibility to when the addon was using positioning instead
+    if (#data.nodes > 100) or (#data.nodes < 1) then
+        DragonridingSpeedrunDB[addon.currentQuest] = nil
+        return
+    end
+    
+    for i = 1, #data.nodes do
+        table.insert(addon.currentVertices, data.nodes[i])
     end
 end
