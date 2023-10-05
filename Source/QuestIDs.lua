@@ -353,4 +353,18 @@ addon.questIDs = {
 	76035,
 	75312,
 	76036,
+	76445, 76446, 76447, -- Ironforge Interceptor
+	76309, 76310, 76311, -- Gilneas Gambit
+	76339, 76340, 76341, -- Loch Modan Loop
+	76357, 76358, 76359, -- Searing Slalom
+	76364, 76365, 76366, -- Twilight Terror
+	76380, 76381, 76382, -- Deadwind Derby
+	76397, 76399, 76400, -- Elwynn Forest Flash
+	76438, 76439, 76440, -- Gurubashi Gala
+	76469, 76470, 76471, -- Blasted Lands Bolt
+	76510, 76512, 76513, -- Plaguelands Plunge
+	76515, 76516, 76517, -- Booty Bay Blast
+	76523, 76524, 76525, -- Fuselight Night Flight
+	76527, 76528, 76529, -- Krazzworks Klash
+	76536, 76537, 76538, -- Redridge Rally
 }
