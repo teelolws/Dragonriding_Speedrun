@@ -218,14 +218,19 @@ function addon.addonLoadedHandler(...)
     
     libEME:RegisterFrame(addon.CountdownLabel, "Dragonriding Speedrun", DragonridingSpeedrunUI)
     libEME:RegisterResizable(addon.CountdownLabel)
+    
+    addon.loadDatamining()
 end
 
 function addon.processEndOfRace(raceTime)
-    if not DragonridingSpeedrunDB[addon.currentQuest] then
-        DragonridingSpeedrunDB[addon.currentQuest] = {}
+    local currentQuest = addon.currentQuest
+    addon.currentQuest = nil
+    
+    if not DragonridingSpeedrunDB[currentQuest] then
+        DragonridingSpeedrunDB[currentQuest] = {}
     end
     
-    if DragonridingSpeedrunDB[addon.currentQuest].bestTime and (DragonridingSpeedrunDB[addon.currentQuest].bestTime < raceTime) then
+    if DragonridingSpeedrunDB[currentQuest].bestTime and (DragonridingSpeedrunDB[currentQuest].bestTime < raceTime) then
         return
     end
     
@@ -239,8 +244,8 @@ function addon.processEndOfRace(raceTime)
     
     table.insert(currentRaceData, data)
     
-    DragonridingSpeedrunDB[addon.currentQuest].bestTime = raceTime
-    DragonridingSpeedrunDB[addon.currentQuest].nodes = currentRaceData
+    DragonridingSpeedrunDB[currentQuest].bestTime = raceTime
+    DragonridingSpeedrunDB[currentQuest].nodes = currentRaceData
 end
 
 addon.CountdownLabel = CreateFrame("Frame", "DragonridingSpeedrunLabel", UIParent)
@@ -266,7 +271,17 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     local output = ""
     local currentVertex
     
-    for i = 1, #addon.currentVertices do
+    local initialVertexNum = addon.nextVertexNum - 5
+    if initialVertexNum < 1 then
+        initialVertexNum = 1
+    end
+    
+    local maxVertexNum = addon.nextVertexNum + 5
+    if maxVertexNum > #addon.currentVertices then
+        maxVertexNum = #addon.currentVertices
+    end 
+    
+    for i = initialVertexNum, maxVertexNum do
         local vertex = addon.currentVertices[i]
         if i < addon.nextVertexNum then
             local timeDiff = vertex.time - addon.currentVerticesTimes[i]

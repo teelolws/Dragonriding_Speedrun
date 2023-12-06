@@ -20,6 +20,56 @@ function addon.findVertices()
         return
     end
     
+    if addon.coordinates[addon.currentQuest] then
+        local i = 1
+        local k = 1
+        for index, node in ipairs(addon.coordinates[addon.currentQuest]) do
+            node.time = i*30
+            i = i + 1
+            
+            if data.nodes then
+                for j = k, #data.nodes do
+                    local node2 = data.nodes[j]
+                    
+                    if (math.abs(node.x - node2.x) < addon.options.global.radiusPermitted) and (math.abs(node.y - node2.y) < addon.options.global.radiusPermitted) then
+                        node.time = node2.time
+                        k = j
+                        break
+                    end
+                end
+            end
+                
+            table.insert(addon.currentVertices, node)
+        end
+        return
+    end
+    
+    if DragonridingSpeedrunDatamining and DragonridingSpeedrunDatamining[addon.currentQuest] then
+        local i = 1
+        local k = 1
+        for index, node in ipairs(DragonridingSpeedrunDatamining[addon.currentQuest]) do
+            local node = CopyTable(node)
+            
+            node.time = i*30
+            i = i + 1
+            
+            if data.nodes then
+                for j = k, #data.nodes do
+                    local node2 = data.nodes[j]
+                    
+                    if (math.abs(node.x - node2.x) < addon.options.global.radiusPermitted) and (math.abs(node.y - node2.y) < addon.options.global.radiusPermitted) then
+                        node.time = node2.time
+                        k = j
+                        break
+                    end
+                end
+            end
+                
+            table.insert(addon.currentVertices, node)
+        end
+        return
+    end
+    
     if #data.nodes < 5 then return end
     
     local threshold = CHANGE_THRESHOLD

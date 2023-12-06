@@ -1,5 +1,5 @@
 ## Interface: 100200
-## SavedVariables: DragonridingSpeedrunDB, DragonridingSpeedrunUI, DragonridingSpeedrunOptions
+## SavedVariables: DragonridingSpeedrunDB, DragonridingSpeedrunUI, DragonridingSpeedrunOptions, DragonridingSpeedrunDatamining
 ## Title: Dragonriding Speedrun
 ## Version: @project-version@
 ## Notes: Helps you tell if you're doing better than your best attempt at Dragonriding Races
@@ -21,3 +21,5 @@ RaceCompletePhrases.lua
 VertexCalculations.lua
 Dragonriding_Speedrun.lua
 Options.lua
+Datamining.lua
+Coordinates.lua
