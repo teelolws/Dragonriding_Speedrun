@@ -6,6 +6,44 @@ addon.currentVerticesTimes = {}
 
 local CHANGE_THRESHOLD = math.pi/8
 
+local function useSavedCoordinates(data)
+    local i = 1
+    local k = 1
+    
+    -- node is the stored list of coordinates known to be waypoints
+    -- node2 is the players attempt at reaching that waypoint
+    -- this will cut down the amount of data needed to be stored
+    -- we can just store the relevant nodes instead of every 0.1s from the previous algorithm
+    local node2s = {}
+    
+    for index, node in ipairs(data) do
+        node = CopyTable(node)
+        
+        node.time = i*30
+        i = i + 1
+        
+        if DragonridingSpeedrunDB[addon.currentQuest].nodes then
+            for j = k, #DragonridingSpeedrunDB[addon.currentQuest].nodes do
+                local node2 = DragonridingSpeedrunDB[addon.currentQuest].nodes[j]
+                
+                if (math.abs(node.x - node2.x) < addon.options.global.radiusPermitted) and (math.abs(node.y - node2.y) < addon.options.global.radiusPermitted) then
+                    node.time = node2.time
+                    k = j
+                    table.insert(node2s, node2)
+                    print("d")
+                    break
+                end
+            end
+        end
+            
+        table.insert(addon.currentVertices, node)
+    end
+    
+    if DragonridingSpeedrunDB[addon.currentQuest].nodes then
+        DragonridingSpeedrunDB[addon.currentQuest].nodes = node2s
+    end
+end
+
 function addon.findVertices()
     wipe(addon.currentVertices)
     addon.nextVertexNum = 1
@@ -21,52 +59,12 @@ function addon.findVertices()
     end
     
     if addon.coordinates[addon.currentQuest] then
-        local i = 1
-        local k = 1
-        for index, node in ipairs(addon.coordinates[addon.currentQuest]) do
-            node.time = i*30
-            i = i + 1
-            
-            if data.nodes then
-                for j = k, #data.nodes do
-                    local node2 = data.nodes[j]
-                    
-                    if (math.abs(node.x - node2.x) < addon.options.global.radiusPermitted) and (math.abs(node.y - node2.y) < addon.options.global.radiusPermitted) then
-                        node.time = node2.time
-                        k = j
-                        break
-                    end
-                end
-            end
-                
-            table.insert(addon.currentVertices, node)
-        end
+        useSavedCoordinates(addon.coordinates[addon.currentQuest])
         return
     end
     
     if DragonridingSpeedrunDatamining and DragonridingSpeedrunDatamining[addon.currentQuest] then
-        local i = 1
-        local k = 1
-        for index, node in ipairs(DragonridingSpeedrunDatamining[addon.currentQuest]) do
-            local node = CopyTable(node)
-            
-            node.time = i*30
-            i = i + 1
-            
-            if data.nodes then
-                for j = k, #data.nodes do
-                    local node2 = data.nodes[j]
-                    
-                    if (math.abs(node.x - node2.x) < addon.options.global.radiusPermitted) and (math.abs(node.y - node2.y) < addon.options.global.radiusPermitted) then
-                        node.time = node2.time
-                        k = j
-                        break
-                    end
-                end
-            end
-                
-            table.insert(addon.currentVertices, node)
-        end
+        useSavedCoordinates(DragonridingSpeedrunDatamining[addon.currentQuest])
         return
     end
     
