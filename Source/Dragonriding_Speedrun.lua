@@ -285,7 +285,7 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
         local vertex = addon.currentVertices[i]
         if i < addon.nextVertexNum then
             local timeDiff = vertex.time - addon.currentVerticesTimes[i]
-            timeDiff = math.floor(timeDiff*100)/100
+            timeDiff = math.floor(timeDiff*addon.options.global.precision)/addon.options.global.precision
             if timeDiff < 0 then
                 output = output.."|cFFFF0000"..timeDiff.."|r\n"
             else
@@ -294,7 +294,7 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
         elseif i == addon.nextVertexNum then
             local timeDiff = vertex.time - elapsedTime
             currentVertex = vertex
-            timeDiff = math.floor(timeDiff*100)/100
+            timeDiff = math.floor(timeDiff*addon.options.global.precision)/addon.options.global.precision
             if timeDiff < 0 then
                 output = output.."|cFFFF0000"..timeDiff.."|r\n"
             else
@@ -303,7 +303,7 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
         else
             local time = vertex.time
             time = time - currentVertex.time
-            time = math.floor(time*100)/100
+            time = math.floor(time*addon.options.global.precision)/addon.options.global.precision
             output = output.."|c00808080"..time.."|r\n"
         end
     end

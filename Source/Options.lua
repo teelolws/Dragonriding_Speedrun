@@ -10,6 +10,7 @@ local defaults = {
         maxVertices = 10,
         overrideVertices = 6,
         timeSpacing = 3,
+        precision = 2,
     }
 }
 
@@ -62,6 +63,14 @@ local options = {
             type = "range",
             min = 1,
             max = 30,
+            step = 1,
+        },
+        precision = {
+            name = "Decimal places",
+            desc = "Number of decimal places to show times to",
+            type = "range",
+            min = 0,
+            max = 6,
             step = 1,
         },
     },
