@@ -122,7 +122,7 @@ addon.coordinates[78115] = { -- Emerald Dream Emerald Amble Basic
 		["x"] = -983.7999877929688,
 	}, -- [30]
 }
-[78117] = { -- Emerald Dream Emerald Amble Reverse
+addon.coordinates[78117] = { -- Emerald Dream Emerald Amble Reverse
 	{
 		["y"] = 8527.1005859375,
 		["x"] = -1010.799987792969,
@@ -248,7 +248,7 @@ addon.coordinates[78115] = { -- Emerald Dream Emerald Amble Basic
 		["x"] = -980.5,
 	}, -- [31]
 }
-[78118] = { -- Emerald Dream Emerald Amble Challenge
+addon.coordinates[78118] = { -- Emerald Dream Emerald Amble Challenge
 	{
 		["y"] = 8528.2998046875,
 		["x"] = -1011.299987792969,
@@ -370,7 +370,7 @@ addon.coordinates[78115] = { -- Emerald Dream Emerald Amble Basic
 		["x"] = -982.1000366210938,
 	}, -- [30]
 }
-[78116] = { -- Emerald Dream Emerald Amble Advanced
+addon.coordinates[78116] = { -- Emerald Dream Emerald Amble Advanced
 	{
 		["y"] = 8531.2998046875,
 		["x"] = -1010.700012207031,
@@ -492,7 +492,7 @@ addon.coordinates[78115] = { -- Emerald Dream Emerald Amble Basic
 		["x"] = -983,
 	}, -- [30]
 }
-[78119] = { -- Emerald Dream Emerald Amble Reverse Challenge
+addon.coordinates[78119] = { -- Emerald Dream Emerald Amble Reverse Challenge
 	{
 		["y"] = 8525,
 		["x"] = -1010.600036621094,
