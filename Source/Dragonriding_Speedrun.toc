@@ -40,4 +40,9 @@ db\thaldraszus\TyrholdTrial.lua
 db\wakingshores\EmberflowFlight.lua
 db\wakingshores\UktulutCoaster.lua
 db\wakingshores\WildPreserveSlalom.lua
+db\zaralek\BrimstoneScramble.lua
+db\zaralek\CalderaCruise.lua
+db\zaralek\CrystalCircuit.lua
+db\zaralek\LoammRoamm.lua
+db\zaralek\ShimmeringSlalom.lua
 db\zaralek\SulfurSprint.lua

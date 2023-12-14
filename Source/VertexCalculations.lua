@@ -17,10 +17,6 @@ local function useSavedCoordinates(data)
     local node2s = {}
     
     for index, node in ipairs(data) do
-        if type(node) == "number" then
-            node = data[node]
-        end
-        
         node = CopyTable(node)
         
         node.time = i*30
@@ -42,7 +38,7 @@ local function useSavedCoordinates(data)
         table.insert(addon.currentVertices, node)
     end
     
-    if DragonridingSpeedrunDB[addon.currentQuest].nodes then
+    if DragonridingSpeedrunDB[addon.currentQuest].nodes and (#node2s > 2) and (#node2s ~= #DragonridingSpeedrunDB[addon.currentQuest].nodes) then
         DragonridingSpeedrunDB[addon.currentQuest].nodes = node2s
     end
 end
@@ -62,7 +58,11 @@ function addon.findVertices()
     end
     
     if addon.coordinates[addon.currentQuest] then
-        useSavedCoordinates(addon.coordinates[addon.currentQuest])
+       local data = addon.coordinates[addon.currentQuest]
+        if type(data) == "number" then
+            data = addon.coordinates[data]
+        end
+        useSavedCoordinates(data)
         return
     end
     
