@@ -17,6 +17,10 @@ local function useSavedCoordinates(data)
     local node2s = {}
     
     for index, node in ipairs(data) do
+        if type(node) == "number" then
+            node = data[node]
+        end
+        
         node = CopyTable(node)
         
         node.time = i*30
@@ -30,7 +34,6 @@ local function useSavedCoordinates(data)
                     node.time = node2.time
                     k = j
                     table.insert(node2s, node2)
-                    print("d")
                     break
                 end
             end
