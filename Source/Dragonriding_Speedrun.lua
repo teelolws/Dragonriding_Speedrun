@@ -147,7 +147,7 @@ function addon.startTimers()
         ticker:Cancel()
     end
     
-    ticker = C_Timer.NewTicker(0.1, addon.ticker)
+    ticker = C_Timer.NewTicker(0.01, addon.ticker)
 end
 
 function addon.resetTimers()
@@ -285,27 +285,32 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
         local vertex = addon.currentVertices[i]
         local precision = 10^addon.options.global.precision
         if i < addon.nextVertexNum then
-            local timeDiff = vertex.time - addon.currentVerticesTimes[i]
-            timeDiff = math.floor(timeDiff*precision)/precision
-            if timeDiff < 0 then
-                output = output.."|cFFFF0000"..timeDiff.."|r\n"
-            else
-                output = output.."|c00008000"..timeDiff.."|r\n"
+            if vertex.time then
+                local timeDiff = vertex.time - addon.currentVerticesTimes[i]
+                timeDiff = math.floor(timeDiff*precision)/precision
+                if timeDiff < 0 then
+                    output = output.."|cFFFF0000"..timeDiff.."|r\n"
+                else
+                    output = output.."|c00008000"..timeDiff.."|r\n"
+                end
             end
         elseif i == addon.nextVertexNum then
-            local timeDiff = vertex.time - elapsedTime
             currentVertex = vertex
-            timeDiff = math.floor(timeDiff*precision)/precision
-            if timeDiff < 0 then
-                output = output.."|cFFFF0000"..timeDiff.."|r\n"
-            else
-                output = output..timeDiff.."\n"
+            if vertex.time then
+                local timeDiff = vertex.time - elapsedTime
+                timeDiff = math.floor(timeDiff*precision)/precision
+                if timeDiff < 0 then
+                    output = output.."|cFFFF0000"..timeDiff.."|r\n"
+                else
+                    output = output..timeDiff.."\n"
+                end
             end
         else
-            local time = vertex.time
-            time = time - currentVertex.time
-            time = math.floor(time*precision)/precision
-            output = output.."|c00808080"..time.."|r\n"
+            if vertex.time and currentVertex.time then
+                local time = vertex.time - currentVertex.time
+                time = math.floor(time*precision)/precision
+                output = output.."|c00808080"..time.."|r\n"
+            end
         end
     end
     addon.CountdownLabel.Text:SetText(output)
