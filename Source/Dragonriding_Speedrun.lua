@@ -186,9 +186,14 @@ function addon.ticker()
     end
     
     if addon.coordinates[addon.currentQuest] then
+        local data = addon.coordinates[addon.currentQuest]
+        if type(data) == "number" then
+            data = addon.coordinates[data]
+        end
+        
         local needed = false
         
-        for index, node in ipairs(addon.coordinates[addon.currentQuest]) do
+        for index, node in ipairs(data) do
             if DragonridingSpeedrunDB[addon.currentQuest].nodes then
                 if (math.abs(node.x - x) < addon.options.global.radiusPermitted) and (math.abs(node.y - y) < addon.options.global.radiusPermitted) then
                     needed = true
