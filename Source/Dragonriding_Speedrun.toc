@@ -33,11 +33,13 @@ db\emerald\ViridescentVenture.lua
 db\emerald\YseraInvitational.lua
 db\ohnaran\FenFlythrough.lua
 db\ohnaran\SundappleCopse.lua
+db\reach\MorqutAscent.lua
 db\thaldraszus\AcademyAscent.lua
 db\thaldraszus\FlowingForest.lua
 db\thaldraszus\GardenGallivant.lua
 db\thaldraszus\TyrholdTrial.lua
 db\wakingshores\EmberflowFlight.lua
+db\wakingshores\RubyLifeshrineLoop.lua
 db\wakingshores\UktulutCoaster.lua
 db\wakingshores\WildPreserveSlalom.lua
 db\zaralek\BrimstoneScramble.lua
