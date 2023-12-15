@@ -7,7 +7,6 @@ addon.currentVerticesTimes = {}
 local CHANGE_THRESHOLD = math.pi/8
 
 local function useSavedCoordinates(data)
-    local i = 1
     local k = 1
     
     -- node is the stored list of coordinates known to be waypoints
@@ -18,9 +17,6 @@ local function useSavedCoordinates(data)
     
     for index, node in ipairs(data) do
         node = CopyTable(node)
-        
-        node.time = i*30
-        i = i + 1
         
         if DragonridingSpeedrunDB[addon.currentQuest].nodes then
             for j = k, #DragonridingSpeedrunDB[addon.currentQuest].nodes do
