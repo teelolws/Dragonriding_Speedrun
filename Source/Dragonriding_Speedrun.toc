@@ -38,9 +38,12 @@ db\thaldraszus\AcademyAscent.lua
 db\thaldraszus\FlowingForest.lua
 db\thaldraszus\GardenGallivant.lua
 db\thaldraszus\TyrholdTrial.lua
+db\wakingshores\ApexCanopy.lua
 db\wakingshores\EmberflowFlight.lua
 db\wakingshores\RubyLifeshrineLoop.lua
 db\wakingshores\UktulutCoaster.lua
+db\wakingshores\WingrestRoundabout.lua
+db\wakingshores\WildPreserveCircuit.lua
 db\wakingshores\WildPreserveSlalom.lua
 db\zaralek\BrimstoneScramble.lua
 db\zaralek\CalderaCruise.lua
