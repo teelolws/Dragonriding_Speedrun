@@ -25,6 +25,7 @@ Datamining.lua
 
 db\init.lua
 db\azurespan\ArchiveAmbit.lua
+db\azurespan\Iskaara.lua
 db\emerald\CanopyConcours.lua
 db\emerald\EmeraldAmble.lua
 db\emerald\ShorelineSwitchback.lua
@@ -33,6 +34,8 @@ db\emerald\ViridescentVenture.lua
 db\emerald\YseraInvitational.lua
 db\ohnaran\EmeraldGardens.lua
 db\ohnaran\FenFlythrough.lua
+db\ohnaran\Ravine.lua
+db\ohnaran\RiverRapids.lua
 db\ohnaran\SundappleCopse.lua
 db\reach\MorqutAscent.lua
 db\thaldraszus\AcademyAscent.lua
