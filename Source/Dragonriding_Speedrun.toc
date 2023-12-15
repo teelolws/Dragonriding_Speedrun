@@ -31,6 +31,7 @@ db\emerald\ShorelineSwitchback.lua
 db\emerald\SmolderingSpring.lua
 db\emerald\ViridescentVenture.lua
 db\emerald\YseraInvitational.lua
+db\ohnaran\EmeraldGardens.lua
 db\ohnaran\FenFlythrough.lua
 db\ohnaran\SundappleCopse.lua
 db\reach\MorqutAscent.lua
