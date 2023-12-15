@@ -36,3 +36,14 @@ function addon.loadDatamining()
         print("Saved", x, ",", y)
     end)
 end
+
+function DragonridingSpeedrunCleanupMemory()
+    if not DragonridingSpeedrunDB.datamining then return end
+    
+    for questID, data in pairs(addon.coordinates) do
+        addon.currentQuest = questID
+        addon.findVertices()
+    end
+    
+    addon.currentQuest = nil
+end
