@@ -27,7 +27,9 @@ db\init.lua
 db\azurespan\ArchiveAmbit.lua
 db\azurespan\AzureSpanSlalom.lua
 db\azurespan\AzureSpanSprint.lua
+db\azurespan\FrostlandFlyover.lua
 db\azurespan\Iskaara.lua
+db\azurespan\VakthrosAscent.lua
 db\emerald\CanopyConcours.lua
 db\emerald\EmeraldAmble.lua
 db\emerald\ShorelineSwitchback.lua
