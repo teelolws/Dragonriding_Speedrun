@@ -25,6 +25,7 @@ Datamining.lua
 
 db\init.lua
 db\azurespan\ArchiveAmbit.lua
+db\azurespan\AzureSpanSlalom.lua
 db\azurespan\Iskaara.lua
 db\emerald\CanopyConcours.lua
 db\emerald\EmeraldAmble.lua
