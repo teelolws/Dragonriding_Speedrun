@@ -38,7 +38,7 @@ local function useSavedCoordinates(data)
         table.insert(addon.currentVertices, node)
     end
     
-    if DragonridingSpeedrunDB[addon.currentQuest].nodes and (#node2s > 2) and (#node2s ~= #DragonridingSpeedrunDB[addon.currentQuest].nodes) then
+    if DragonridingSpeedrunDB[addon.currentQuest].nodes and (#node2s > 2) and (#node2s ~= #DragonridingSpeedrunDB[addon.currentQuest].nodes) and (#node2s == #addon.currentVertices) then
         DragonridingSpeedrunDB[addon.currentQuest].nodes = node2s
     end
 end
