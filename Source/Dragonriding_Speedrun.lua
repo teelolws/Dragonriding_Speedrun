@@ -185,6 +185,21 @@ function addon.ticker()
         return
     end
     
+    if addon.coordinates[addon.currentQuest] then
+        local needed = false
+        
+        for index, node in ipairs(addon.coordinates[addon.currentQuest]) do
+            if DragonridingSpeedrunDB[addon.currentQuest].nodes then
+                if (math.abs(node.x - x) < addon.options.global.radiusPermitted) and (math.abs(node.y - y) < addon.options.global.radiusPermitted) then
+                    needed = true
+                    break
+                end
+            end
+        end
+        
+        if not needed then return end
+    end
+    
     local elapsedTime = GetTime() - startTime    
     
     local data = {}
