@@ -142,7 +142,7 @@ addon.coordinates[70052] = { -- Thaldraszus Cliffside Circuit Advanced
 		["x"] = 895.1000366210938,
 	}, -- [35]
 }
-[75824] = { -- Thaldraszus Cliffside Circuit Challenge
+addon.coordinates[75824] = { -- Thaldraszus Cliffside Circuit Challenge
 	{
 		["y"] = -712.7000122070312,
 		["x"] = 938.7000122070312,
@@ -284,7 +284,7 @@ addon.coordinates[70052] = { -- Thaldraszus Cliffside Circuit Advanced
 		["x"] = 896.5,
 	}, -- [35]
 }
-[75825] = { -- Thaldraszus Cliffside Circuit Reverse Challenge
+addon.coordinates[75825] = { -- Thaldraszus Cliffside Circuit Reverse Challenge
 	{
 		["y"] = -757.2999877929688,
 		["x"] = 885.9000244140625,
@@ -426,7 +426,7 @@ addon.coordinates[70052] = { -- Thaldraszus Cliffside Circuit Advanced
 		["x"] = 907.7999877929688,
 	}, -- [35]
 }
-[72760] = { -- Thaldraszus Cliffside Circuit Reverse
+addon.coordinates[72760] = { -- Thaldraszus Cliffside Circuit Reverse
 	{
 		["y"] = -767,
 		["x"] = 884.4000244140625,
@@ -572,7 +572,7 @@ addon.coordinates[70052] = { -- Thaldraszus Cliffside Circuit Advanced
 		["x"] = 904.4000244140625,
 	}, -- [36]
 }
-[70051] = { -- Thaldraszus Cliffside Circuit Basic
+addon.coordinates[70051] = { -- Thaldraszus Cliffside Circuit Basic
 	{
 		["y"] = -713.2000122070312,
 		["x"] = 938.1000366210938,
