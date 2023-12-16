@@ -146,7 +146,7 @@ addon.coordinates[73061] = { -- Forbidden Reach Forbidden Reach Rush Basic
 		["x"] = 6381.2001953125,
 	}, -- [36]
 }
-[73062] = { -- Forbidden Reach Forbidden Reach Rush Advanced
+addon.coordinates[73062] = { -- Forbidden Reach Forbidden Reach Rush Advanced
 	{
 		["y"] = -3146.800048828125,
 		["x"] = 6413.89990234375,
@@ -292,7 +292,7 @@ addon.coordinates[73061] = { -- Forbidden Reach Forbidden Reach Rush Basic
 		["x"] = 6381.7001953125,
 	}, -- [36]
 }
-[73065] = { -- Forbidden Reach Forbidden Reach Rush Reverse
+addon.coordinates[73065] = { -- Forbidden Reach Forbidden Reach Rush Reverse
 	{
 		["y"] = -3371.300048828125,
 		["x"] = 6356,
@@ -438,5 +438,5 @@ addon.coordinates[73061] = { -- Forbidden Reach Forbidden Reach Rush Basic
 		["x"] = 6374.30029296875,
 	}, -- [36]
 }
-[75964] = 73062 -- Forbidden Reach Forbidden Reach Rush Challenge
-[75965] = 73065 -- Forbidden Reach Forbidden Reach Rush Reverse Challenge
+addon.coordinates[75964] = 73062 -- Forbidden Reach Forbidden Reach Rush Challenge
+addon.coordinates[75965] = 73065 -- Forbidden Reach Forbidden Reach Rush Reverse Challenge
