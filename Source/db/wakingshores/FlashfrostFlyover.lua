@@ -118,7 +118,7 @@ addon.coordinates[75789] = { -- Waking Shores Flashfrost Flyover Challenge
 		["x"] = 1461.900024414063,
 	}, -- [29]
 }
-[75790] = { -- Waking Shores Flashfrost Flyover Reverse Challenge
+addon.coordinates[75790] = { -- Waking Shores Flashfrost Flyover Reverse Challenge
 	{
 		["y"] = -330.8999938964844,
 		["x"] = 1465.400024414063,
@@ -240,7 +240,7 @@ addon.coordinates[75789] = { -- Waking Shores Flashfrost Flyover Challenge
 		["x"] = 1434.200073242188,
 	}, -- [30]
 }
-[72700] = { -- Waking Shores Flashfrost Flyover Reverse
+addon.coordinates[72700] = { -- Waking Shores Flashfrost Flyover Reverse
 	{
 		["y"] = -325.6000061035156,
 		["x"] = 1472.099975585938,
