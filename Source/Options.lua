@@ -11,6 +11,8 @@ local defaults = {
         overrideVertices = 6,
         timeSpacing = 3,
         precision = 2,
+        detectionFrequency = 50,
+        maxLinesBeforeAfter = 4,
     }
 }
 
@@ -71,6 +73,22 @@ local options = {
             type = "range",
             min = 0,
             max = 6,
+            step = 1,
+        },
+        detectionFrequency = {
+            name = "Detection Frequency",
+            desc = "Number of times a second to check your position. Higher frequency may cause a performance loss!",
+            type = "range",
+            min = 10,
+            max = 150,
+            step = 10,
+        },
+        maxLinesBeforeAfter = {
+            name = "Max Lines To Show",
+            desc = "Maximum number of lines to display before and after the current node.",
+            type = "range",
+            min = 1,
+            max = 10,
             step = 1,
         },
     },

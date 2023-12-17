@@ -147,7 +147,7 @@ function addon.startTimers()
         ticker:Cancel()
     end
     
-    ticker = C_Timer.NewTicker(0.01, addon.ticker)
+    ticker = C_Timer.NewTicker(1/addon.options.global.detectionFrequency, addon.ticker)
 end
 
 function addon.resetTimers()
@@ -194,11 +194,9 @@ function addon.ticker()
         local needed = false
         
         for index, node in ipairs(data) do
-            if DragonridingSpeedrunDB[addon.currentQuest].nodes then
-                if (math.abs(node.x - x) < addon.options.global.radiusPermitted) and (math.abs(node.y - y) < addon.options.global.radiusPermitted) then
-                    needed = true
-                    break
-                end
+            if (math.abs(node.x - x) < addon.options.global.radiusPermitted) and (math.abs(node.y - y) < addon.options.global.radiusPermitted) then
+                needed = true
+                break
             end
         end
         
@@ -291,12 +289,12 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     local output = ""
     local currentVertex
     
-    local initialVertexNum = addon.nextVertexNum - 5
+    local initialVertexNum = addon.nextVertexNum - addon.options.global.maxLinesBeforeAfter
     if initialVertexNum < 1 then
         initialVertexNum = 1
     end
     
-    local maxVertexNum = addon.nextVertexNum + 5
+    local maxVertexNum = addon.nextVertexNum + addon.options.global.maxLinesBeforeAfter
     if maxVertexNum > #addon.currentVertices then
         maxVertexNum = #addon.currentVertices
     end 
