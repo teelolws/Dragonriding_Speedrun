@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100205
 ## SavedVariables: DragonridingSpeedrunDB, DragonridingSpeedrunUI, DragonridingSpeedrunOptions, DragonridingSpeedrunDatamining
 ## Title: Dragonriding Speedrun
 ## Version: @project-version@
