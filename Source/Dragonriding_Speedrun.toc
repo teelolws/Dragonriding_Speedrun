@@ -41,6 +41,11 @@ db\ohnaran\FenFlythrough.lua
 db\ohnaran\Ravine.lua
 db\ohnaran\RiverRapids.lua
 db\ohnaran\SundappleCopse.lua
+db\outland\AuchindounCoaster.lua
+db\outland\FelPitFracas.lua
+db\outland\ShattrathSashay.lua
+db\outland\ShadowmoonSlam.lua
+db\outland\SkettisScramble.lua
 db\reach\CalderaCoaster.lua
 db\reach\MorqutAscent.lua
 db\reach\Rush.lua
