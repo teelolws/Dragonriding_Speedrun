@@ -35,6 +35,13 @@ function addon.loadDatamining()
         table.insert(DragonridingSpeedrunDatamining[addon.currentQuest], {["x"] = x, ["y"] = y})
         print("Saved", x, ",", y)
     end)
+    
+    local distanceFrame = CreateFrame("Frame", "DragonridingSpeedrunDebuggingFrame")
+    distanceFrame:SetSize(200, 35)
+    distanceFrame:SetPoint("CENTER", 0, -100)
+    distanceFrame.Text = distanceFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+    distanceFrame.Text:SetPoint("CENTER")
+    distanceFrame.Text:SetJustifyH("LEFT")
 end
 
 function DragonridingSpeedrunCleanupMemory()

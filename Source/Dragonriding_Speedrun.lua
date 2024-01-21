@@ -337,12 +337,25 @@ addon.CountdownLabel:SetScript("OnUpdate", function()
     
     local nextVertex = addon.currentVertices[addon.nextVertexNum]
     if not nextVertex then return end
-    local diffX, diffY = x - nextVertex.x, y - nextVertex.y 
-    if (diffX < addon.options.global.radiusPermitted) and (diffX > (-1 * addon.options.global.radiusPermitted)) then
-        if (diffY < addon.options.global.radiusPermitted) and (diffY > (-1 * addon.options.global.radiusPermitted)) then
+    local diffX, diffY = x - nextVertex.x, y - nextVertex.y
+    local radiusPermitted = addon.options.global.radiusPermitted
+    if (diffX < radiusPermitted) and (diffX > (-1 * radiusPermitted)) then
+        if (diffY < radiusPermitted) and (diffY > (-1 * radiusPermitted)) then
             addon.currentVerticesTimes[addon.nextVertexNum] = elapsedTime
             addon.nextVertexNum = addon.nextVertexNum + 1
         end
+    end
+    
+    if DragonridingSpeedrunDB.datamining then
+        diffX = math.floor(diffX)
+        diffY = math.floor(diffY)
+        if diffX < radiusPermitted and diffX > (-1 * radiusPermitted) then
+            diffX = "|cFFFF0000"..diffX
+        end
+        if diffY < radiusPermitted and diffY > (-1 * radiusPermitted) then
+            diffY = "|cFFFF0000"..diffY
+        end
+        DragonridingSpeedrunDebuggingFrame.Text:SetText(diffX..", "..diffY..": ("..radiusPermitted..")")
     end
 end)
 
