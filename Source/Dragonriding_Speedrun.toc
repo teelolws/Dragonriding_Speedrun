@@ -36,6 +36,8 @@ db\emerald\ShorelineSwitchback.lua
 db\emerald\SmolderingSpring.lua
 db\emerald\ViridescentVenture.lua
 db\emerald\YseraInvitational.lua
+db\northrend\ColdarraClimb.lua
+db\northrend\GeothermalJaunt.lua
 db\ohnaran\EmeraldGardens.lua
 db\ohnaran\FenFlythrough.lua
 db\ohnaran\Ravine.lua
