@@ -40,6 +40,7 @@ db\northrend\ColdarraClimb.lua
 db\northrend\DaggercapDart.lua
 db\northrend\GeothermalJaunt.lua
 db\northrend\ScalawagSlither.lua
+db\northrend\SholazarSpree.lua
 db\ohnaran\EmeraldGardens.lua
 db\ohnaran\FenFlythrough.lua
 db\ohnaran\Ravine.lua
