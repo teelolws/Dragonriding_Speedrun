@@ -42,6 +42,7 @@ db\northrend\CrystalsongCrisis.lua
 db\northrend\DaggercapDart.lua
 db\northrend\DragonblightDragonflight.lua
 db\northrend\GeothermalJaunt.lua
+db\northrend\MakersMarathon.lua
 db\northrend\ScalawagSlither.lua
 db\northrend\SholazarSpree.lua
 db\ohnaran\EmeraldGardens.lua
