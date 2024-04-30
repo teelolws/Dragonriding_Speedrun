@@ -33,6 +33,7 @@ addon.raceStartingSpellIDs = {
 	[375358] = true,
 	[375477] = true,
 	[375479] = true,
+    [375810] = true,
 	[376062] = true,
 	[376195] = true,
 	[376366] = true,
