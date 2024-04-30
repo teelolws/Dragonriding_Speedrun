@@ -1,7 +1,6 @@
 local addonName, addon = ...
 
 addon.raceStartingSpellIDs = {
-	[376062] = true,
 	[369893] = true,
 	[370014] = true,
 	[370326] = true,
@@ -34,7 +33,7 @@ addon.raceStartingSpellIDs = {
 	[375358] = true,
 	[375477] = true,
 	[375479] = true,
-	[375810] = true,
+	[376062] = true,
 	[376195] = true,
 	[376366] = true,
 	[376805] = true,
@@ -428,5 +427,11 @@ addon.raceStartingSpellIDs = {
 	[426585] = true,
 	[427231] = true,
 	[427234] = true,
-    [427235] = true,
+	[427235] = true,
+	[431833] = true,
+	[431834] = true,
+	[431835] = true,
+	[431898] = true,
+	[431899] = true,
+    [431900] = true,
 }
