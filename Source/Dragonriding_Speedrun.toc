@@ -38,7 +38,9 @@ db\emerald\ViridescentVenture.lua
 db\emerald\YseraInvitational.lua
 db\northrend\CitadelSortie.lua
 db\northrend\ColdarraClimb.lua
+db\northrend\CrystalsongCrisis.lua
 db\northrend\DaggercapDart.lua
+db\northrend\DragonblightDragonflight.lua
 db\northrend\GeothermalJaunt.lua
 db\northrend\ScalawagSlither.lua
 db\northrend\SholazarSpree.lua
