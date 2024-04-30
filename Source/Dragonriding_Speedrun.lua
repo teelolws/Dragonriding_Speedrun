@@ -263,6 +263,13 @@ function addon.processEndOfRace(raceTime)
     table.insert(currentRaceData, data)
     
     DragonridingSpeedrunDB[currentQuest].bestTime = raceTime
+    
+    for _, node in ipairs(currentRaceData) do
+        node.x = math.floor(node.x*1000)/1000
+        node.y = math.floor(node.y*1000)/1000
+        node.time = math.floor(node.time*1000)/1000
+    end
+    
     DragonridingSpeedrunDB[currentQuest].nodes = currentRaceData
 end
 
