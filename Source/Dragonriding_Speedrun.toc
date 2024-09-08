@@ -23,6 +23,12 @@ Options.lua
 Datamining.lua
 
 db\init.lua
+db\Azj-Kahet\City of Threads Twist.lua
+db\Azj-Kahet\Maddening Deep Dip.lua
+db\Azj-Kahet\Pit Plunge.lua
+db\Azj-Kahet\Rak-Ahat Rush.lua
+db\Azj-Kahet\Siegehold Scuttle.lua
+db\Azj-Kahet\Weavers Wing.lua
 db\azurespan\ArchiveAmbit.lua
 db\azurespan\AzureSpanSlalom.lua
 db\azurespan\AzureSpanSprint.lua
@@ -35,6 +41,18 @@ db\emerald\ShorelineSwitchback.lua
 db\emerald\SmolderingSpring.lua
 db\emerald\ViridescentVenture.lua
 db\emerald\YseraInvitational.lua
+db\Hallowfall\Dunelle's Detour.lua
+db\Hallowfall\Lights Redoubt Descent.lua
+db\Hallowfall\Mereldar Meander.lua
+db\Hallowfall\Stillstone Slalom.lua
+db\Hallowfall\Tenir's Traversal.lua
+db\Hallowfall\Velhan's Venture.lua
+db\Isle of Dorn\Basin Bypass.lua
+db\Isle of Dorn\Dornogal Drift.lua
+db\Isle of Dorn\Orecreg's Doglegs.lua
+db\Isle of Dorn\Storm's Watch Survey.lua
+db\Isle of Dorn\The Wold Ways.lua
+db\Isle of Dorn\Thunderhead Trail.lua
 db\northrend\BlackriverBurble.lua
 db\northrend\CitadelSortie.lua
 db\northrend\ColdarraClimb.lua
@@ -70,6 +88,12 @@ db\reach\MorqutAscent.lua
 db\reach\Rush.lua
 db\reach\SouthernReach.lua
 db\reach\StormsunderCrater.lua
+db\Ringing Deeps\Cataract River Cruise.lua
+db\Ringing Deeps\Chittering Concourse.lua
+db\Ringing Deeps\Earthenworks Weave.lua
+db\Ringing Deeps\Opportunity Point Amble.lua
+db\Ringing Deeps\Ringing Deeps Ramble.lua
+db\Ringing Deeps\Taelloch Twist.lua
 db\thaldraszus\AcademyAscent.lua
 db\thaldraszus\CavernsCrissCross.lua
 db\thaldraszus\CliffsideCircuit.lua
