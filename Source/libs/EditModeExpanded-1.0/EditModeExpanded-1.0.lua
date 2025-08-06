@@ -2,7 +2,7 @@
 -- Internal variables
 --
 
-local MAJOR, MINOR = "EditModeExpanded-1.0", 89
+local MAJOR, MINOR = "EditModeExpanded-1.0", 94
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
@@ -55,7 +55,10 @@ local function Mixin(object, ...)
         local mixin = select(i, ...);
         for k, v in pairs(mixin) do
             if not object[k] then
-                object[k] = v;
+                -- 11.1: bugfix - need to not include AddSnappedFrame as this spreads taint and causes errors
+                if k ~= "AddSnappedFrame" then
+                    object[k] = v;
+                end
             end
         end
     end
@@ -116,7 +119,9 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
     assert(type(db) == "table")
     
     if frame:IsUserPlaced() then
-        frame:SetUserPlaced(false)
+        if frame:IsMovable() or frame:IsResizable() then
+            frame:SetUserPlaced(false)
+        end
     end
     
     if not anchorTo then anchorTo = UIParent end
@@ -230,7 +235,10 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
     frame.Selection:Hide()
     
     frame.systemNameString = name
-    frame.Selection:SetGetLabelTextFunction(function() return name end)
+    
+    -- this was removed in 11.2, TODO: find if it was replaced by anything important
+    --frame.Selection:SetGetLabelTextFunction(function() return name end) 
+    
     frame:SetupSettingsDialogAnchor();
     
     --frame.snappedFrames = {}; -- this was spreading taint, need to check for the absence causing errors
@@ -529,9 +537,11 @@ end
 -- param1: an edit mode registered frame, either one already registered by Blizz, or a custom one you have registered with lib:RegisterFrame
 -- param2: minimum size, default will be 10
 -- param3: maximum size, default will be 200
-function lib:RegisterResizable(frame, minSize, maxSize)
+-- param3: step size, default will be 5
+function lib:RegisterResizable(frame, minSize, maxSize, step)
     minSize = minSize or 10
     maxSize = maxSize or 200
+    step = step or 5
     local systemID = getSystemID(frame)
     
     if not framesDialogs[systemID] then framesDialogs[systemID] = {} end
@@ -545,7 +555,7 @@ function lib:RegisterResizable(frame, minSize, maxSize)
             type = Enum.EditModeSettingDisplayType.Slider,
             minValue = minSize,
             maxValue = maxSize,
-            stepSize = 5,
+            stepSize = step,
         })
     
     local db = framesDB[systemID]
@@ -1082,7 +1092,7 @@ hooksecurefunc(f, "OnLoad", function()
         end
     end)
     
-    checkButtonFrame.Text:SetText("Disable highlighting")
+    checkButtonFrame.Text:SetText(DISABLE.." "..string.gsub(HIGHLIGHTING, ":", ""))
     checkButtonFrame.Text:SetFontObject(GameFontHighlightMedium)
     checkButtonFrame:SetSize(32, 32)
     checkButtonFrame:SetPoint("TOPLEFT", EditModeManagerExpandedFrame.AccountSettings, "TOPLEFT", 20, 0)
