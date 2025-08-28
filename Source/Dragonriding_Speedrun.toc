@@ -114,3 +114,17 @@ db\zaralek\CrystalCircuit.lua
 db\zaralek\LoammRoamm.lua
 db\zaralek\ShimmeringSlalom.lua
 db\zaralek\SulfurSprint.lua
+db\Eastern Kingdoms\Twilight Terror.lua
+db\Eastern Kingdoms\Searing Slalom.lua
+db\Eastern Kingdoms\Redridge Rally.lua
+db\Eastern Kingdoms\Plaguelands Plunge.lua
+db\Eastern Kingdoms\Loch Modan Loop.lua
+db\Eastern Kingdoms\Krazzworks Klash.lua
+db\Eastern Kingdoms\Ironforge Interceptor.lua
+db\Eastern Kingdoms\Gurubashi Gala.lua
+db\Eastern Kingdoms\Gilneas Gambit.lua
+db\Eastern Kingdoms\Fuselight Night Flight.lua
+db\Eastern Kingdoms\Elwynn Forest Flash.lua
+db\Eastern Kingdoms\Deadwind Derby.lua
+db\Eastern Kingdoms\Booty Bay Blast.lua
+db\Eastern Kingdoms\Blasted Lands Bolt.lua
