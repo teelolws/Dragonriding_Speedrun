@@ -53,6 +53,7 @@ db\Isle of Dorn\Orecreg's Doglegs.lua
 db\Isle of Dorn\Storm's Watch Survey.lua
 db\Isle of Dorn\The Wold Ways.lua
 db\Isle of Dorn\Thunderhead Trail.lua
+db\karesh\OasisOverdrive.lua
 db\northrend\BlackriverBurble.lua
 db\northrend\CitadelSortie.lua
 db\northrend\ColdarraClimb.lua
