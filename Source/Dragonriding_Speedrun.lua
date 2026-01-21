@@ -42,6 +42,7 @@ function addon.questRemovedHandler(...)
 end
 
 function addon.unitAuraHandler(...)
+    if InCombatLockdown() then return end
     local unitID, updateInfo = ...
     if unitID ~= "player" then return end
     
