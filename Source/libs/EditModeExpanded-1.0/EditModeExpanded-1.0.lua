@@ -2,7 +2,7 @@
 -- Internal variables
 --
 
-local MAJOR, MINOR = "EditModeExpanded-1.0", 106
+local MAJOR, MINOR = "EditModeExpanded-1.0", 113
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
@@ -196,7 +196,11 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
         local profileName = layoutInfo.layoutType.."-"..layoutInfo.layoutName
         if layoutInfo.layoutType == Enum.EditModeLayoutType.Character then
             local unitName, unitRealm = UnitFullName("player")
-            profileName = layoutInfo.layoutType.."-"..unitName.."-"..unitRealm.."-"..layoutInfo.layoutName
+            -- See https://github.com/teelolws/EditModeExpanded/issues/201
+            -- Despite the docs, it seems unitRealm can still sometimes be nil
+            if unitName and unitRealm then
+                profileName = layoutInfo.layoutType.."-"..unitName.."-"..unitRealm.."-"..layoutInfo.layoutName
+            end
         end
         
         if not db.profiles then db.profiles = {} end
@@ -326,17 +330,25 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
         self.hasActiveChanges = hasActiveChanges;
     end
 
-    EditModeManagerExpandedFrame.AccountSettings[frame.system] = CreateFrame("CheckButton", nil, EditModeManagerExpandedFrame.AccountSettings, "UICheckButtonTemplate")
-    local checkButtonFrame = EditModeManagerExpandedFrame.AccountSettings[frame.system]
-    frame.EMECheckButtonFrame = checkButtonFrame
-    local resetButton = CreateFrame("Button", nil, EditModeManagerFrame, "UIPanelButtonTemplate")
+    local scrollChild = EditModeManagerExpandedFrame.AccountSettings:GetScrollChild()
+    scrollChild[frame.system] = CreateFrame("Frame", nil, scrollChild, "ResizeCheckButtonTemplate")
+    local checkButtonFrame = scrollChild[frame.system]
+    frame.EMECheckButtonFrame = checkButtonFrame.Button
+    checkButtonFrame.layoutIndex = EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex
+    EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex = EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex + 1
+    checkButtonFrame.fixedWidth = 225
+    checkButtonFrame.fixedHeight = 32
+    
+    local resetButton = CreateFrame("Button", nil, checkButtonFrame, "UIPanelButtonTemplate")
     frame.EMEResetButton = resetButton
+    resetButton.ignoreInLayout = true
     resetButton:SetText(RESET)
-    resetButton:SetPoint("TOPLEFT", checkButtonFrame.Text, "TOPRIGHT", 20, 2)
+    resetButton:SetPoint("TOPLEFT", checkButtonFrame.Label, "TOPRIGHT", 5, 2)
     resetButton:SetScript("OnClick", function()
         local profiledb = framesDB[frame.system]
         frame:ClearAllPoints()
-        frame:SetScaleOverride(1)
+        frame:SetClampedToScreen(true)
+
         if not profiledb.defaultX then profiledb.defaultX = 0 end
         if not profiledb.defaultY then profiledb.defaultY = 0 end
         local x, y = getOffsetXY(frame, profiledb.defaultX, profiledb.defaultY)
@@ -345,9 +357,11 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
             frame:SetPoint("BOTTOMLEFT", nil, "BOTTOMLEFT", x, y)
         end
         
+        profiledb.clamped = true
         profiledb.x = profiledb.defaultX
         profiledb.y = profiledb.defaultY
-        profiledb.settings[ENUM_EDITMODEACTIONBARSETTING_FRAMESIZE] = 100
+        frame:SetScaleOverride(profiledb.defaultScale)
+        profiledb.settings[ENUM_EDITMODEACTIONBARSETTING_FRAMESIZE] = profiledb.defaultScale * 100
         EditModeExpandedSystemSettingsDialog:Hide()
         frame:HighlightSystem()
         
@@ -363,33 +377,17 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
         resetButton:Show()
     end)
     
-    checkButtonFrame:SetScript("OnClick", function(self)
+    checkButtonFrame.Button:SetScript("OnClick", function(self)
         local isChecked = self:GetChecked()
         framesDB[frame.system].enabled = isChecked
         frame:SetShown(isChecked)
     end)
     
-    checkButtonFrame.Text:SetText(name)
-    checkButtonFrame.Text:SetFontObject(GameFontHighlightMedium)
-    checkButtonFrame:SetSize(32, 32)
-    
-    checkButtonFrame.index = frame.system
-    if not lib.firstCheckButtonPlaced then
-        lib.firstCheckButtonPlaced = true
-        checkButtonFrame:SetPoint("TOPLEFT", EditModeManagerExpandedFrame.AccountSettings.disableHighlightTexturesOption, "BOTTOMLEFT", 0, 10)
-    else
-        -- some system IDs may be existing edit mode frames which were not assigned a checkbox
-        local previousSystemID = frame.system - 1
-        local i = 1
-        while (not EditModeManagerExpandedFrame.AccountSettings[previousSystemID]) or (EditModeManagerExpandedFrame.AccountSettings[previousSystemID].hiddenByGrouping) do
-            i = i + 1
-            previousSystemID = frame.system - i
-        end
-        checkButtonFrame:SetPoint("TOPLEFT", EditModeManagerExpandedFrame.AccountSettings[previousSystemID], "BOTTOMLEFT", 0, 10)
-    end
+    checkButtonFrame.Label:SetText(name)
+    checkButtonFrame.Label:SetFontObject(GameFontHighlightMedium)
     
     if db.enabled == nil then db.enabled = true end
-    checkButtonFrame:SetChecked(db.enabled)
+    checkButtonFrame.Button:SetChecked(db.enabled)
     
     function frame:GetSettingValue(setting)
         local profiledb = framesDB[frame.system]
@@ -584,6 +582,8 @@ function lib:UpdateFrameResize(frame)
     local systemID = getSystemID(frame)
     local db = framesDB[systemID]
     
+    if not framesDialogsKeys[systemID][ENUM_EDITMODEACTIONBARSETTING_FRAMESIZE] then return end
+    
     if db.settings[ENUM_EDITMODEACTIONBARSETTING_FRAMESIZE] ~= nil then
         frame:SetScale(db.settings[ENUM_EDITMODEACTIONBARSETTING_FRAMESIZE]/100)
     end
@@ -702,7 +702,7 @@ end
 local extraDialogItems = {}
 -- call this to register a custom button
 -- the button will not save any settings
-function lib:RegisterCustomButton(frame, name, onClick)
+function lib:RegisterCustomButton(frame, name, onClick, internalName)
     local systemID = getSystemID(frame)
     
     local button = CreateFrame("Button", nil, EditModeExpandedSystemSettingsDialog.Settings, "UIPanelButtonTemplate,ResizeLayoutFrame")
@@ -720,6 +720,16 @@ function lib:RegisterCustomButton(frame, name, onClick)
     )
     
     table.insert(extraDialogItems, button)
+    
+    local function getCurrentDB()
+        local db = framesDB[getSystemID(frame)]
+        if not db.settings[ENUM_EDITMODEACTIONBARSETTING_BUTTON] then db.settings[ENUM_EDITMODEACTIONBARSETTING_BUTTON] = {} end
+        if not db.settings[ENUM_EDITMODEACTIONBARSETTING_BUTTON][internalName] then db.settings[ENUM_EDITMODEACTIONBARSETTING_BUTTON][internalName] = {} end
+        
+        return db.settings[ENUM_EDITMODEACTIONBARSETTING_BUTTON][internalName]
+    end
+    
+    return getCurrentDB
 end
 
 -- call this to register a frame to have its position specified by the user using screen coordinates
@@ -923,31 +933,101 @@ hooksecurefunc(f, "OnLoad", function()
     end
     
     if not EditModeManagerExpandedFrame then
-        CreateFrame("Frame", "EditModeManagerExpandedFrame", nil, UIParent)
+        CreateFrame("Frame", "EditModeManagerExpandedFrame", UIParent, "VerticalLayoutFrame")
+    elseif not EditModeManagerExpandedFrame.Layout then
+        -- workaround for bug prior to v108
+        -- remove this in a future update when older versions of this library no longer work
+        for _, frame in pairs(frames) do
+            if frame.EMEResetButton and (frame.EMEResetButton:GetParent() == EditModeManagerFrame) then
+                frame.EMEResetButton:SetParent(UIParent)
+                frame.EMEResetButton:ClearAllPoints()
+                frame.EMEResetButton:Hide()
+            end
+        end
+        
+        -- backward compatibility: expanded frame was created by an older version of the library before vertical layout template was added
+        Mixin(EditModeManagerExpandedFrame, LayoutMixin, VerticalLayoutMixin)
     end
     EditModeManagerExpandedFrame:Hide();
     
-    -- This no longer seems to be correct during the loading screen
-    C_Timer.After(1, function()
-        EditModeManagerExpandedFrame:SetScale(UIParent:GetScale());
+    -- Cannot parent it to EditModeManagerFrame, as I'd have to set a "ignoreInLayout" value, which would then spread taint
+    EditModeManagerExpandedFrame:SetFrameStrata("DIALOG")
+    
+    EditModeManagerExpandedFrame:ClearAllPoints()
+    EditModeManagerExpandedFrame:SetPoint("TOPLEFT", EditModeManagerFrame, "BOTTOMLEFT", 0, -2)
+    EditModeManagerExpandedFrame:SetPoint("TOPRIGHT", EditModeManagerFrame, "BOTTOMRIGHT", 0, -2)
+    EditModeManagerExpandedFrame.spacing = -5
+    
+    EditModeManagerExpandedFrame.Expander = EditModeManagerExpandedFrame.Expander or CreateFrame("Frame", nil, EditModeManagerExpandedFrame, "ResizeLayoutFrame")
+    EditModeManagerExpandedFrame.Expander.layoutIndex = 3
+    EditModeManagerExpandedFrame.Expander.heightPadding = 8
+    EditModeManagerExpandedFrame.Expander.align = "center"
+    
+    EditModeManagerExpandedFrame.Expander.Divider = EditModeManagerExpandedFrame.Expander.Divider or EditModeManagerExpandedFrame.Expander:CreateTexture(nil, "ARTWORK")
+    EditModeManagerExpandedFrame.Expander.Divider:SetTexture("Interface\\FriendsFrame\\UI-FriendsFrame-OnlineDivider")
+    EditModeManagerExpandedFrame.Expander.Divider:SetSize(330, 16)
+    EditModeManagerExpandedFrame.Expander.Divider:SetPoint("TOP")
+    
+    EditModeManagerExpandedFrame.Expander.Label = EditModeManagerExpandedFrame.Expander.Label or EditModeManagerExpandedFrame.Expander:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
+    EditModeManagerExpandedFrame.Expander.Label:SetText(HUD_EDIT_MODE_EXPAND_OPTIONS)
+    EditModeManagerExpandedFrame.Expander.Label:SetPoint("TOP", EditModeManagerExpandedFrame.Expander.Divider, "BOTTOM", 0, 5)
+    EditModeManagerExpandedFrame.Expander:SetScript("OnMouseUp", function()
+        local expanded = not EditModeManagerExpandedFrame.AccountSettings:IsShown()
+        EditModeManagerExpandedFrame.AccountSettings:SetShown(expanded)
+        EditModeManagerExpandedFrame.Expander.Label:SetText(expanded and HUD_EDIT_MODE_COLLAPSE_OPTIONS or HUD_EDIT_MODE_EXPAND_OPTIONS);
+        EditModeManagerExpandedFrame:Layout()
     end)
     
-    EditModeManagerExpandedFrame:SetPoint("TOPLEFT", EditModeManagerFrame, "TOPRIGHT", 2, 0)
-    EditModeManagerExpandedFrame:SetPoint("BOTTOMLEFT", EditModeManagerFrame, "BOTTOMRIGHT", 2, 0)
-    EditModeManagerExpandedFrame:SetWidth(300)
     EditModeManagerExpandedFrame.Title = EditModeManagerExpandedFrame.Title or EditModeManagerExpandedFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightLarge")
-    EditModeManagerExpandedFrame.Title:SetPoint("TOP", 0, -15)
     EditModeManagerExpandedFrame.Title:SetText("Expanded")
+    EditModeManagerExpandedFrame.Title.layoutIndex = 1
+    EditModeManagerExpandedFrame.Title.align = "center"
+    EditModeManagerExpandedFrame.Title.topPadding = 15
+    EditModeManagerExpandedFrame.Title.bottomPadding = 8
+    
     EditModeManagerExpandedFrame.Border = EditModeManagerExpandedFrame.Border or CreateFrame("Frame", nil, EditModeManagerExpandedFrame, "DialogBorderTranslucentTemplate")
-    EditModeManagerExpandedFrame.AccountSettings = EditModeManagerExpandedFrame.AccountSettings or CreateFrame("Frame", nil, EditModeManagerExpandedFrame)
-    EditModeManagerExpandedFrame.AccountSettings:SetPoint("TOPLEFT", 0, -35)
-    EditModeManagerExpandedFrame.AccountSettings:SetPoint("BOTTOMLEFT", 10, 10)
-    EditModeManagerExpandedFrame.AccountSettings:SetWidth(200)
+    EditModeManagerExpandedFrame.Border.ignoreInLayout = true
+    
     EditModeManagerExpandedFrame.CloseButton = EditModeManagerExpandedFrame.CloseButton or CreateFrame("Button", nil, EditModeManagerExpandedFrame, "UIPanelCloseButton")
     EditModeManagerExpandedFrame.CloseButton:SetPoint("TOPRIGHT")
+    EditModeManagerExpandedFrame.CloseButton.ignoreInLayout = true
+
+    if EditModeManagerExpandedFrame.AccountSettings then
+        if not EditModeManagerExpandedFrame.AccountSettings.ScrollChild then
+            -- backward compatibility: old version of the library exists
+            EditModeManagerExpandedFrame.AccountSettings:Hide()
+            EditModeManagerExpandedFrame.AccountSettings:SetParent(UIParent)
+            EditModeManagerExpandedFrame.AccountSettings = CreateFrame("ScrollFrame", nil, EditModeManagerExpandedFrame, "ResizeLayoutFrame, ScrollFrameTemplate")
+        end
+    else
+        EditModeManagerExpandedFrame.AccountSettings = CreateFrame("ScrollFrame", nil, EditModeManagerExpandedFrame, "ResizeLayoutFrame, ScrollFrameTemplate")
+    end
+    EditModeManagerExpandedFrame.AccountSettings.layoutIndex = 2
+    EditModeManagerExpandedFrame.AccountSettings.fixedWidth = 470
+    EditModeManagerExpandedFrame.AccountSettings.maximumHeight = 195
+    EditModeManagerExpandedFrame.AccountSettings.leftPadding = 20
+	EditModeManagerExpandedFrame.AccountSettings.ScrollBar:SetHideIfUnscrollable(true)
+	EditModeManagerExpandedFrame.AccountSettings.ScrollBar:SetPoint("TOPLEFT", EditModeManagerExpandedFrame.AccountSettings, "TOPRIGHT", -15, -5)
+	EditModeManagerExpandedFrame.AccountSettings.ScrollBar:SetPoint("BOTTOMLEFT", EditModeManagerExpandedFrame.AccountSettings, "BOTTOMRIGHT", -15, SCROLL_FRAME_SCROLL_BAR_OFFSET_BOTTOM)
+    EditModeManagerExpandedFrame.AccountSettings:Hide()
+    EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex = EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex or 1
+    
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild = EditModeManagerExpandedFrame.AccountSettings.ScrollChild or CreateFrame("Frame", nil, EditModeManagerExpandedFrame.AccountSettings, "GridLayoutFrame")
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild:SetSize(1, 1)
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild:SetPoint("TOPLEFT")
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.childXPadding = 0
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.childYPadding = 0
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.isHorizontal = true
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.stride = 2
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.layoutFramesGoingRight = true
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.layoutFramesGoingUp = false
+    EditModeManagerExpandedFrame.AccountSettings.ScrollChild.alwaysUpdateLayout = true
+    EditModeManagerExpandedFrame.AccountSettings:SetScrollChild(EditModeManagerExpandedFrame.AccountSettings.ScrollChild)
+
     
     hookScriptWrapper(EditModeManagerFrame, "OnShow", function()
         EditModeManagerExpandedFrame:Show()
+        EditModeManagerExpandedFrame:Layout()
     end)
     
     hookScriptWrapper(EditModeManagerFrame, "OnHide", function()
@@ -1051,6 +1131,8 @@ hooksecurefunc(f, "OnLoad", function()
             EditModeExpandedSystemSettingsDialog:Hide()
         end
         
+        if InCombatLockdown() then return end
+        
         for _, frame in ipairs(frames) do
             if systemFrame ~= frame then
                 frame:HighlightSystem()
@@ -1059,6 +1141,7 @@ hooksecurefunc(f, "OnLoad", function()
     end)
     
     hooksecurefuncWrapper(EditModeManagerFrame, "MakeNewLayout", function(self, _, layoutType, layoutName)
+        if InCombatLockdown() then return end
         local oldProfileName = previousProfileNames[2]
         if not oldProfileName then
             oldProfileName = previousProfileNames[1]
@@ -1154,10 +1237,16 @@ hooksecurefunc(f, "OnLoad", function()
     end
     
     -- Add the option to hide the highlight textures
-    EditModeManagerExpandedFrame.AccountSettings.disableHighlightTexturesOption = EditModeManagerExpandedFrame.AccountSettings.disableHighlightTexturesOption or CreateFrame("CheckButton", nil, EditModeManagerExpandedFrame.AccountSettings, "UICheckButtonTemplate")
-    local checkButtonFrame = EditModeManagerExpandedFrame.AccountSettings.disableHighlightTexturesOption
+    local scrollChild = EditModeManagerExpandedFrame.AccountSettings:GetScrollChild()
+    if scrollChild.disableHighlightTexturesOption then return end
+    scrollChild.disableHighlightTexturesOption = CreateFrame("Frame", nil, scrollChild, "ResizeCheckButtonTemplate")
+    local checkButtonFrame = scrollChild.disableHighlightTexturesOption
+    checkButtonFrame.layoutIndex = EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex
+    EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex = EditModeManagerExpandedFrame.AccountSettings.nextLayoutIndex + 1
+    checkButtonFrame.fixedWidth = 225
+    checkButtonFrame.fixedHeight = 32
     
-    checkButtonFrame:SetScript("OnClick", function(self)
+    checkButtonFrame.Button:SetScript("OnClick", function(self)
         local isChecked = self:GetChecked()
         local sides = {
         	"TopRightCorner",
@@ -1188,10 +1277,9 @@ hooksecurefunc(f, "OnLoad", function()
         end
     end)
     
-    checkButtonFrame.Text:SetText(DISABLE.." "..string.gsub(HIGHLIGHTING, ":", ""))
-    checkButtonFrame.Text:SetFontObject(GameFontHighlightMedium)
+    checkButtonFrame.Label:SetText(DISABLE.." "..string.gsub(HIGHLIGHTING, ":", ""))
+    checkButtonFrame.Label:SetFontObject(GameFontHighlightMedium)
     checkButtonFrame:SetSize(32, 32)
-    checkButtonFrame:SetPoint("TOPLEFT", EditModeManagerExpandedFrame.AccountSettings, "TOPLEFT", 20, 0)
 end)
 
 local function hideFrameUntilMouseover(frame)
@@ -2054,12 +2142,12 @@ function lib:GroupOptions(frameGroup, name)
         end
     end)
     
-    checkButtonFrame.Text:SetText(name)
+    checkButtonFrame:GetParent().Label:SetText(name)
     
     for i, frame in ipairs(frameGroup) do
         if i > 1 then
             frame.EMECheckButtonFrame.hiddenByGrouping = true
-            frame.EMECheckButtonFrame:Hide()
+            frame.EMECheckButtonFrame:GetParent():Hide()
             frame.EMEResetButton.hiddenByGrouping = true
             frame.EMEResetButton:Hide()
         end
