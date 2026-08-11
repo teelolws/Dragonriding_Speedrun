@@ -2,9 +2,27 @@
 -- Internal variables
 --
 
-local MAJOR, MINOR = "EditModeExpanded-1.0", 114
+local MAJOR, MINOR = "EditModeExpanded-1.0", 117
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
+
+local L = {
+    ["enUS"] = {
+        ["CLAMP_TO_SCREEN"] = "Clamp to Screen",
+        ["TOGGLE_VISIBILITY_COMBAT"] = "Toggle Visibility in Combat",
+        ["COORDINATES"] = "Coordinates:",
+        ["EXPANDED"] = "Expanded",
+    },
+    ["zhCN"] = {
+        ["CLAMP_TO_SCREEN"] = "Text needed here",
+        ["TOGGLE_VISIBILITY_COMBAT"] = "Text needed here",
+        ["COORDINATES"] = "Coordinates:",
+        ["EXPANDED"] = "Expanded",
+    },
+    -- ["frFR"] ptBR etc
+}
+
+L = L[GetLocale()] or L["enUS"]
 
 -- the internal frames provided by Blizzard go up to index 19. They reference Enum.EditModeSystem, which starts from index 0
 local STARTING_INDEX = 0
@@ -114,6 +132,20 @@ setmetatable(framesDialogsKeys, {
         return t[k]
     end,
 })
+
+-- archived from EditModeSystemTemplates.lua
+local EditModeSystemSelectionLayout =
+{
+	["TopRightCorner"] = { atlas = "%s-NineSlice-Corner", mirrorLayout = true, x=8, y=8 },
+	["TopLeftCorner"] = { atlas = "%s-NineSlice-Corner", mirrorLayout = true, x=-8, y=8 },
+	["BottomLeftCorner"] = { atlas = "%s-NineSlice-Corner", mirrorLayout = true, x=-8, y=-8 },
+	["BottomRightCorner"] = { atlas = "%s-NineSlice-Corner",  mirrorLayout = true, x=8, y=-8 },
+	["TopEdge"] = { atlas = "_%s-NineSlice-EdgeTop" },
+	["BottomEdge"] = { atlas = "_%s-NineSlice-EdgeBottom" },
+	["LeftEdge"] = { atlas = "!%s-NineSlice-EdgeLeft" },
+	["RightEdge"] = { atlas = "!%s-NineSlice-EdgeRight" },
+	["Center"] = { atlas = "%s-NineSlice-Center", x = -8, y = 8, x1 = 8, y1 = -8, },
+};
 
 --
 -- Public API
@@ -229,6 +261,19 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
     frame.BreakFrameSnap = function() end
     frame.SnapToFrame = function() end
     
+    function frame:HighlightSystem()
+    	if self.isDragging then
+    		self:OnDragStop();
+    	end
+
+    	self:SetMovable(false);
+    	--self:AnchorSelectionFrame();
+    	self.Selection:ShowHighlighted();
+    	self.isHighlighted = true;
+    	self.isSelected = false;
+    	--self:UpdateMagnetismRegistration();
+    end
+    
     frame.system = nextSystemIDIndex
     nextSystemIDIndex = nextSystemIDIndex + 1
     baseFramesDB[frame.system] = baseDB 
@@ -245,9 +290,31 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
     end
 
     frame.Selection = CreateFrame("Frame", nil, frame, "EditModeSystemSelectionTemplate")
+    frame.Selection.CheckShowInstructionalTooltip = nop
     frame.Selection:SetAllPoints(frame)
     frame.defaultHideSelection = true
     frame.Selection:Hide()
+    
+    function frame.Selection:ShowHighlighted()
+    	if self.textureShown ~= "highlight" then
+    		NineSliceUtil.ApplyLayout(self, EditModeSystemSelectionLayout, self.highlightTextureKit);
+    		self.textureShown = "highlight";
+    	end
+    	self.isSelected = false;
+    	--self:UpdateLabelVisibility();
+    	self:Show();
+    end
+
+    function frame.Selection:ShowSelected()
+    	if self.textureShown ~= "selected" then
+    		NineSliceUtil.ApplyLayout(self, EditModeSystemSelectionLayout, self.selectedTextureKit);
+    		self.textureShown = "selected";
+    	end
+    	self.isSelected = true;
+    	--self:UpdateLabelVisibility();
+    	--self:CheckShowInstructionalTooltip();
+    	self:Show();
+    end
     
     frame.systemNameString = name
     
@@ -269,12 +336,12 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
     table.insert(framesDialogs[frame.system],
         {
             setting = ENUM_EDITMODEACTIONBARSETTING_CLAMPED,
-            name = "Clamp to Screen",
+            name = L["CLAMP_TO_SCREEN"],
             type = Enum.EditModeSettingDisplayType.Checkbox,
         }
     )
     
-    function frame.UpdateMagnetismRegistration() end
+    frame.UpdateMagnetismRegistration = nop
 
     frame.Selection:SetScript("OnMouseDown", function()
         frame:SelectSystem()
@@ -292,6 +359,7 @@ function lib:RegisterFrame(frame, name, db, anchorTo, anchorPoint, clamped)
                 EditModeExpandedSystemSettingsDialog:Hide()
             end
         end
+        
         for _, frame2 in ipairs(frames) do
             if frame2 ~= frame then
                 frame2:HighlightSystem()
@@ -601,7 +669,7 @@ function lib:RegisterHideable(frame, onEventHandler)
     table.insert(framesDialogs[systemID],
         {
             setting = ENUM_EDITMODEACTIONBARSETTING_HIDEABLE,
-            name = "Hide",
+            name = HIDE,
             type = Enum.EditModeSettingDisplayType.Checkbox,
     })
     
@@ -753,7 +821,7 @@ function lib:RegisterCoordinates(frame)
     coordinatePanel.label = coordinatePanel:CreateFontString(nil, nil, "GameTooltipText")
     local label = coordinatePanel.label
     label.layoutIndex = 1
-    label:SetText("Coordinates:")
+    label:SetText(L["COORDINATES"])
     
     coordinatePanel.xEditBox = CreateFrame("EditBox", nil, coordinatePanel, "InputBoxTemplate")
     local xEditBox = coordinatePanel.xEditBox
@@ -980,7 +1048,7 @@ hooksecurefunc(f, "OnLoad", function()
     end)
     
     EditModeManagerExpandedFrame.Title = EditModeManagerExpandedFrame.Title or EditModeManagerExpandedFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightLarge")
-    EditModeManagerExpandedFrame.Title:SetText("Expanded")
+    EditModeManagerExpandedFrame.Title:SetText(L["EXPANDED"])
     EditModeManagerExpandedFrame.Title.layoutIndex = 1
     EditModeManagerExpandedFrame.Title.align = "center"
     EditModeManagerExpandedFrame.Title.topPadding = 15
@@ -1900,6 +1968,10 @@ end
 -- Handle frame being based on a frame other than UIParent
 --
 function getOffsetXY(frame, x, y)
+    if issecretvalue(x) or issecretvalue(y) then
+        return x, y
+    end
+    
     local scale = frame:GetEffectiveScale()
     local parentscale = frame.EMEanchorTo:GetEffectiveScale()
 
@@ -2033,7 +2105,7 @@ function lib:RegisterToggleInCombat(frame, toggleCallback)
     table.insert(framesDialogs[systemID],
         {
             setting = ENUM_EDITMODEACTIONBARSETTING_TOGGLEHIDEINCOMBAT,
-            name = "Toggle Visibility in Combat",
+            name = L["TOGGLE_VISIBILITY_COMBAT"],
             type = Enum.EditModeSettingDisplayType.Checkbox,
             toggleCallback = toggleCallback,
     })
