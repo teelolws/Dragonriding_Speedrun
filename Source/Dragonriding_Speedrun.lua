@@ -64,7 +64,7 @@ function addon.unitAuraHandler(...)
         return
     end
     
-    if updateInfo.addedAuras then
+    if updateInfo.addedAuras and not issecretvalue(updateInfo.addedAuras) then
         for _, addedAuraData in pairs(updateInfo.addedAuras) do
             if issecretvalue(addedAuraData.spellId) then return end
             if addon.raceStartingSpellIDs[addedAuraData.spellId] then
